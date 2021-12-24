@@ -1,10 +1,9 @@
-variable "ecs_cluster_config" {
+variable "ecs_anywhere_config" {
   type = map(object({
     ecs_container_insights = bool
-    ssm_activation_tags    = map(string)
     ssm_instances          = list(string)
   }))
-  description = "Settings for running the edge deployment"
+  description = "Configuration for the ECS Anywhere cluster"
 }
 
 variable "kms_key_id" {

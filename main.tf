@@ -1,11 +1,10 @@
 locals {
   ssm_instances = flatten([
-    for k, v in var.ecs_cluster_config : [
+    for k, v in var.ecs_anywhere_config : [
       for instance in v.ssm_instances :
       {
-        cluster_name        = k
-        instance_name       = instance
-        ssm_activation_tags = v.ssm_activation_tags
+        cluster_name  = k
+        instance_name = instance
       }
     ]
   ])
@@ -13,7 +12,7 @@ locals {
 }
 
 resource "aws_ecs_cluster" "default" {
-  for_each = var.ecs_cluster_config
+  for_each = var.ecs_anywhere_config
 
   name = each.key
   tags = var.tags
@@ -49,11 +48,11 @@ resource "aws_iam_role" "default" {
 resource "aws_ssm_activation" "default" {
   for_each = local.ssm_instances_distinct
 
-  name               = "instance_ssm_activation"
+  name               = each.value.instance_name
   description        = "SSM ECS Anywhere activation for ${each.value.instance_name}"
   iam_role           = aws_iam_role.default.id
   registration_limit = 5
-  tags               = each.value.ssm_activation_tags
+  tags               = var.tags
 }
 
 resource "aws_ssm_parameter" "activation_code" {
