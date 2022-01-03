@@ -1,25 +1,10 @@
-locals {
-  ssm_instances = flatten([
-    for k, v in var.ecs_anywhere_config : [
-      for instance in v.ssm_instances :
-      {
-        cluster_name  = k
-        instance_name = instance
-      }
-    ]
-  ])
-  ssm_instances_distinct = { for instance in local.ssm_instances : "${instance.cluster_name}.${instance.instance_name}" => instance }
-}
-
 resource "aws_ecs_cluster" "default" {
-  for_each = var.ecs_anywhere_config
-
-  name = each.key
+  name = var.cluster_name
   tags = var.tags
 
   setting {
     name  = "containerInsights"
-    value = each.value.ecs_container_insights ? "enabled" : "disabled"
+    value = var.container_insights ? "enabled" : "disabled"
   }
 }
 
@@ -46,41 +31,41 @@ resource "aws_iam_role" "default" {
 }
 
 resource "aws_ssm_activation" "default" {
-  for_each = local.ssm_instances_distinct
+  for_each = toset(var.cluster_instances)
 
-  name               = each.value.instance_name
-  description        = "SSM ECS Anywhere activation for ${each.value.instance_name}"
+  name               = each.value
+  description        = "SSM ECS Anywhere activation for ${each.value} in cluster ${var.cluster_name}"
   iam_role           = aws_iam_role.default.id
   registration_limit = 5
   tags               = var.tags
 }
 
 resource "aws_ssm_parameter" "activation_code" {
-  for_each = local.ssm_instances_distinct
+  for_each = toset(var.cluster_instances)
 
-  name        = "/ecs/${each.value.cluster_name}/activation/${each.value.instance_name}/activation_code"
-  description = "SSM Activation Code for ${each.value.instance_name}"
+  name        = "/ecs/${var.cluster_name}/activation/${each.value}/activation_code"
+  description = "SSM Activation Code for ${each.value}"
   type        = "SecureString"
   value       = aws_ssm_activation.default[each.key].activation_code
   tags        = var.tags
 }
 
 resource "aws_ssm_parameter" "activation_id" {
-  for_each = local.ssm_instances_distinct
+  for_each = toset(var.cluster_instances)
 
-  name        = "/ecs/${each.value.cluster_name}/activation/${each.value.instance_name}/activation_id"
-  description = "SSM Activation Id for ${each.value.instance_name}"
+  name        = "/ecs/${var.cluster_name}/activation/${each.value}/activation_id"
+  description = "SSM Activation Id for ${each.value}"
   type        = "SecureString"
   value       = aws_ssm_activation.default[each.key].id
   tags        = var.tags
 }
 
 resource "aws_ssm_parameter" "shell_command" {
-  for_each = local.ssm_instances_distinct
+  for_each = toset(var.cluster_instances)
 
-  name        = "/ecs/${each.value.cluster_name}/activation/${each.value.instance_name}/shell_command"
-  description = "SSM Activation Id for ${each.value.instance_name}"
+  name        = "/ecs/${var.cluster_name}/activation/${each.value}/shell_command"
+  description = "SSM Activation Id for ${each.value}"
   type        = "SecureString"
-  value       = "curl --proto \"https\" -o \"/tmp/ecs-anywhere-install.sh\" \"https://amazon-ecs-agent.s3.amazonaws.com/ecs-anywhere-install-latest.sh\" && bash /tmp/ecs-anywhere-install.sh --region \"${data.aws_region.current.name}\" --cluster \"${each.value.cluster_name}\" --activation-id \"${aws_ssm_activation.default[each.key].id}\" --activation-code \"${aws_ssm_activation.default[each.key].activation_code}\""
+  value       = "curl --proto \"https\" -o \"/tmp/ecs-anywhere-install.sh\" \"https://amazon-ecs-agent.s3.amazonaws.com/ecs-anywhere-install-latest.sh\" && bash /tmp/ecs-anywhere-install.sh --region \"${data.aws_region.current.name}\" --cluster \"${var.cluster_name}\" --activation-id \"${aws_ssm_activation.default[each.key].id}\" --activation-code \"${aws_ssm_activation.default[each.key].activation_code}\""
   tags        = var.tags
 }
