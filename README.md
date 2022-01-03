@@ -19,9 +19,11 @@ MCAF Terraform module to create and manage an ECS Anywhere setup on an AWS accou
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| ecs\_anywhere\_config | Configuration for the ECS Anywhere cluster | <pre>map(object({<br>    ecs_container_insights = bool<br>    ssm_instances          = list(string)<br>  }))</pre> | n/a | yes |
+| cluster\_name | Name of the ECS Anywhere cluster | `string` | n/a | yes |
 | kms\_key\_id | The KMS key ID used to encrypt SSM secret data | `string` | n/a | yes |
-| tags | A mapping of tags to assign to the cluster | `map(string)` | `{}` | no |
+| tags | A mapping of tags to assign to resources that support it | `map(string)` | n/a | yes |
+| cluster\_instances | List of instances that will be running in this cluster and will get SSM activation entries | `list(any)` | `[]` | no |
+| container\_insights | Whether or not to enable Container Insights to log to Cloudwatch Metrics | `bool` | `false` | no |
 
 ## Outputs
 
