@@ -43,7 +43,7 @@ resource "aws_ssm_activation" "default" {
 resource "aws_ssm_parameter" "activation_code" {
   for_each = toset(var.cluster_instances)
 
-  name        = "/ecs/${var.cluster_name}/activation/${each.value}/activation_code"
+  name        = "/ecs/activation/${each.value}/activation_code"
   description = "SSM Activation Code for ${each.value}"
   type        = "SecureString"
   value       = aws_ssm_activation.default[each.key].activation_code
@@ -53,7 +53,7 @@ resource "aws_ssm_parameter" "activation_code" {
 resource "aws_ssm_parameter" "activation_id" {
   for_each = toset(var.cluster_instances)
 
-  name        = "/ecs/${var.cluster_name}/activation/${each.value}/activation_id"
+  name        = "/ecs/activation/${each.value}/activation_id"
   description = "SSM Activation Id for ${each.value}"
   type        = "SecureString"
   value       = aws_ssm_activation.default[each.key].id
@@ -63,7 +63,7 @@ resource "aws_ssm_parameter" "activation_id" {
 resource "aws_ssm_parameter" "shell_command" {
   for_each = toset(var.cluster_instances)
 
-  name        = "/ecs/${var.cluster_name}/activation/${each.value}/shell_command"
+  name        = "/ecs/activation/${each.value}/shell_command"
   description = "SSM Activation Id for ${each.value}"
   type        = "SecureString"
   value       = "curl --proto \"https\" -o \"/tmp/ecs-anywhere-install.sh\" \"https://amazon-ecs-agent.s3.amazonaws.com/ecs-anywhere-install-latest.sh\" && bash /tmp/ecs-anywhere-install.sh --region \"${data.aws_region.current.name}\" --cluster \"${var.cluster_name}\" --activation-id \"${aws_ssm_activation.default[each.key].id}\" --activation-code \"${aws_ssm_activation.default[each.key].activation_code}\""
