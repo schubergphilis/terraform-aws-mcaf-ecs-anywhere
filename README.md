@@ -27,7 +27,9 @@ MCAF Terraform module to create and manage an ECS Anywhere setup on an AWS accou
 
 ## Outputs
 
-No output.
+| Name | Description |
+|------|-------------|
+| cluster\_id | The ECS cluster ID |
 
 <!--- END_TF_DOCS --->
 
