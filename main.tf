@@ -46,7 +46,7 @@ resource "aws_ssm_parameter" "activation_code" {
   description = "SSM Activation Code for ${each.value}"
   type        = "SecureString"
   value       = aws_ssm_activation.default[each.key].activation_code
-  tags        = var.tags
+  tags        = merge({ Name = each.value }, var.tags)
 }
 
 resource "aws_ssm_parameter" "activation_id" {
