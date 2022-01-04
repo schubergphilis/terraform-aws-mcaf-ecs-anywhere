@@ -8,8 +8,6 @@ resource "aws_ecs_cluster" "default" {
   }
 }
 
-data "aws_region" "current" {}
-
 data "aws_iam_policy_document" "default" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -22,12 +20,13 @@ data "aws_iam_policy_document" "default" {
 }
 
 resource "aws_iam_role" "default" {
-  name = "ECSAnywhereSSMRole"
+  name               = "ECSAnywhereSSMRole"
+  assume_role_policy = data.aws_iam_policy_document.default.json
+
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   ]
-  assume_role_policy = data.aws_iam_policy_document.default.json
 }
 
 resource "aws_ssm_activation" "default" {
@@ -54,18 +53,8 @@ resource "aws_ssm_parameter" "activation_id" {
   for_each = toset(var.cluster_instances)
 
   name        = "/ecs/activation/${each.value}/activation_id"
-  description = "SSM Activation Id for ${each.value}"
+  description = "SSM Activation ID for ${each.value}"
   type        = "SecureString"
   value       = aws_ssm_activation.default[each.key].id
-  tags        = var.tags
-}
-
-resource "aws_ssm_parameter" "shell_command" {
-  for_each = toset(var.cluster_instances)
-
-  name        = "/ecs/activation/${each.value}/shell_command"
-  description = "SSM Activation Id for ${each.value}"
-  type        = "SecureString"
-  value       = "curl --proto \"https\" -o \"/tmp/ecs-anywhere-install.sh\" \"https://amazon-ecs-agent.s3.amazonaws.com/ecs-anywhere-install-latest.sh\" && bash /tmp/ecs-anywhere-install.sh --region \"${data.aws_region.current.name}\" --cluster \"${var.cluster_name}\" --activation-id \"${aws_ssm_activation.default[each.key].id}\" --activation-code \"${aws_ssm_activation.default[each.key].activation_code}\""
   tags        = var.tags
 }

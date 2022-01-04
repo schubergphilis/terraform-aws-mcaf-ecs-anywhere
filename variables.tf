@@ -1,7 +1,7 @@
 variable "cluster_instances" {
-  type        = list(any)
+  type        = list(string)
   default     = []
-  description = "List of instances that will be running in this cluster and will get SSM activation entries"
+  description = "List of cluster instances that will get SSM activation entries"
 }
 
 variable "cluster_name" {
