@@ -30,6 +30,7 @@ MCAF Terraform module to create and manage an ECS Anywhere setup on an AWS accou
 | Name | Description |
 |------|-------------|
 | cluster\_id | The ECS cluster ID |
+| ssm\_role\_id | The IAM role ID used for the SSM activation |
 
 <!--- END_TF_DOCS --->
 
