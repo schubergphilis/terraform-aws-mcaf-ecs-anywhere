@@ -4,6 +4,6 @@ output "cluster_id" {
 }
 
 output "ssm_role_id" {
-  value       = aws_ecs_cluster.default.id
+  value       = aws_iam_role.default.id
   description = "The IAM role ID used for the SSM activation"
 }
