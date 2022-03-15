@@ -1,3 +1,10 @@
+locals {
+  ssm_role_default_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  ]
+}
+
 resource "aws_ecs_cluster" "default" {
   name = var.cluster_name
   tags = var.tags
@@ -20,13 +27,9 @@ data "aws_iam_policy_document" "default" {
 }
 
 resource "aws_iam_role" "default" {
-  name               = "ECSAnywhereSSMRole"
-  assume_role_policy = data.aws_iam_policy_document.default.json
-
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  ]
+  name                = "ECSAnywhereSSMRole"
+  assume_role_policy  = data.aws_iam_policy_document.default.json
+  managed_policy_arns = concat(local.ssm_role_default_policy_arns, var.ssm_role_additional_policy_arns)
 }
 
 resource "aws_ssm_activation" "default" {

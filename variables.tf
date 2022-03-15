@@ -20,6 +20,12 @@ variable "kms_key_id" {
   description = "The KMS key ID used to encrypt SSM secret data"
 }
 
+variable "ssm_role_additional_policy_arns" {
+  type        = list(string)
+  default     = []
+  description = "List of additional policy ARNs to attach to the SSM role"
+}
+
 variable "tags" {
   type        = map(string)
   description = "A mapping of tags to assign to resources that support it"
