@@ -27,6 +27,10 @@ resource "aws_iam_role" "default" {
     "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   ]
+
+  lifecycle {
+    ignore_changes = [managed_policy_arns]
+  }
 }
 
 resource "aws_ssm_activation" "default" {
