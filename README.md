@@ -24,6 +24,7 @@ MCAF Terraform module to create and manage an ECS Anywhere setup on an AWS accou
 | tags | A mapping of tags to assign to resources that support it | `map(string)` | n/a | yes |
 | cluster\_instances | List of cluster instances that will get SSM activation entries | `list(string)` | `[]` | no |
 | container\_insights | Whether or not to enable Container Insights to log to Cloudwatch Metrics | `bool` | `false` | no |
+| ssm\_role\_additional\_policy\_arns | List of additional policy ARNs to attach to the SSM role | `list(string)` | `[]` | no |
 
 ## Outputs
 
