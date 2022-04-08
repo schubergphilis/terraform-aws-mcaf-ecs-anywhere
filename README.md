@@ -7,13 +7,13 @@ MCAF Terraform module to create and manage an ECS Anywhere setup on an AWS accou
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.60 |
+| aws | >= 4.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.60 |
+| aws | >= 4.0.0 |
 
 ## Inputs
 
