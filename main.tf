@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "default" {
 }
 
 resource "aws_iam_role" "default" {
-  name                = "ECSAnywhereSSMRole"
+  name                = "ECSAnywhereSSMRole-${var.cluster_name}"
   assume_role_policy  = data.aws_iam_policy_document.default.json
   managed_policy_arns = concat(local.ssm_role_default_policy_arns, var.ssm_role_additional_policy_arns)
 }
